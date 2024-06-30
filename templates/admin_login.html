@@ -12,11 +12,19 @@
 <body>
     <div class="admin_login">
         <h2>Admin Login</h2>
-    </div>
-
-    <form>
-        
+    
+    <form action ="{{ url_for('admin_login')}}" method="POST">
+        <div class="input">
+            <label for = "username">Username</label>
+            <input type ="text" id ="username" name="username" placeholeder="Enter your username" required>
+       </div>
+        <div class="input">
+            <label for="password">Password:</label>
+            <input type="text" id="password" placeholder="Enter your password" required>
+        </div> 
+        <button class="login_button" type ="submit">Login</button>       
     </form>
-
+    <p>Not a Admin? <a href ="{{url_for('home')}}">Go to home page</a></p>
+    </div>
 </body>
 </html>
