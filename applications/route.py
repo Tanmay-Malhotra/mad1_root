@@ -13,3 +13,13 @@ def register():
         name = request.form.get('name')
         email=request.form.get('email')
         password = request.form.get('password')
+
+
+
+
+
+
+
+
+
+    return render_template()
