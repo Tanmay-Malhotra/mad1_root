@@ -21,6 +21,8 @@
             padding: 50px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
         }
         h1 {
             margin-bottom: 20px;
@@ -52,11 +54,27 @@
             color: red;
             margin-bottom: 20px;
         }
+        .register-links {
+            margin-top: 20px;
+        }
+        .register-links button {
+            padding: 10px 20px;
+            color: white;
+            background-color: #28a745;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .register-links button:hover {
+            background-color: #218838;
+        }
     </style>
 </head>
 <body>
-    <div class="login">
-        <h1>Login</h1>
+    <div class="container">
+        <h1>User Login</h1>
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
             {% for category, message in messages %}
@@ -69,6 +87,15 @@
             <input type="password" name="password" placeholder="Password" required>
             <button type="submit" class="btn">Login</button>
         </form>
+        <div class="register-links">
+            <p>Is this your first time accessing SPOC? <br> Register here:</p>
+            <a href="{{ url_for('sp_reg') }}">
+                <button class="btn">Register as Sponsor</button>
+            </a>
+            <a href="{{ url_for('inf_reg') }}">
+                <button class="btn">Register as Influencer</button>
+            </a>
+        </div>
     </div>
 </body>
 </html>
