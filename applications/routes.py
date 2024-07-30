@@ -1,7 +1,7 @@
 from flask import render_template, request, redirect, url_for, flash, session
 from flask import current_app as app
 from applications.database import db
-from applications.models import Influencer,Sponsor,Campaign
+from applications.models import influencer,sponsor,campaign
 from sqlalchemy import desc
 
 
@@ -18,7 +18,7 @@ def login():
         password = request.form['password']
         
         # Try to find the user in the Sponsor model
-        user = Sponsor.query.filter_by(username=username).first()
+        user = sponsor.query.filter_by(username=username).first()
         if user and user.password == password:
             session['user_id'] = user.id
             flash('Login successful!', 'success')
@@ -26,7 +26,7 @@ def login():
               # Redirect to sponsor homepage
         
         # Try to find the user in the Influencer model
-        user = Influencer.query.filter_by(username=username).first()
+        user = influencer.query.filter_by(username=username).first()
         if user and user.password == password:
             session['user_id'] = user.id
             flash('Login successful!', 'success')
@@ -52,8 +52,8 @@ def inf_reg():
             password = request.form.get('password')
 
             #checking if email is taken or not
-            existing_user = Influencer.query.filter_by(username=username).first()
-            existing_email = Influencer.query.filter_by(email=email).first()
+            existing_user = influencer.query.filter_by(username=username).first()
+            existing_email = influencer.query.filter_by(email=email).first()
             if existing_user:
                 flash('Username is already is in use, Please choose a different one.', 'danger')
                 return redirect(url_for('inf_reg'))
@@ -63,7 +63,7 @@ def inf_reg():
 
 
             #creating the new user with hashed password 
-            new_user = Influencer(username=username, name=name, email=email, password=password)
+            new_user = influencer(username=username, name=name, email=email, password=password)
             db.session.add(new_user)
             db.session.commit()
 
@@ -108,17 +108,17 @@ def sp_reg():
         industry = request.form['industry']
         
         # Check if the email or username already exists
-        existing_sponsor = Sponsor.query.filter((Sponsor.email == email) | (Sponsor.username == username)).first()
+        existing_sponsor = sponsor.query.filter((sponsor.email == email) | (sponsor.username == username)).first()
         if existing_sponsor:
             flash('Username or Email already exists. Please choose a different one.', 'danger')
             return redirect(url_for('sp_reg'))
         
         # Create new sponsor and add to the database
-        new_sponsor = Sponsor(username=username, password=password, email=email, industry=industry)
+        new_sponsor = sponsor(username=username, password=password, email=email, industry=industry)
         db.session.add(new_sponsor)
         db.session.commit()
         flash('Registration successful!', 'success')
-        return redirect(url_for('sp_home'))
+        return redirect(url_for('login'))
     return render_template('sp_reg.html')
 
 #------------------------------sponsor dashboard---------------------------------------------------------
@@ -127,7 +127,7 @@ def get_current_sponsor():
     sponsor_id = session.get('user_id')
     #print(f"Current sponsor ID in session: {sponsor_id}")
     if sponsor_id:
-        return Sponsor.query.get(sponsor_id)
+        return sponsor.query.get(sponsor_id)
     return None
 
 @app.route('/sp_home')
@@ -150,9 +150,19 @@ def sp_home():
 def sp_profile():
     return render_template('sp_home.html')  # Redirect to dashboard for this example
 
-@app.route('/sp_campaigns')
+""" @app.route('/sp_campaigns')
 def sp_campaigns():
-    return render_template('create_camp.html')
+    sponsor_id = session.get('user_id')
+    if not sponsor_id:
+        return redirect(url_for('login'))
+
+    sponsor = Sponsor.query.get(sponsor_id)
+    if sponsor is None:
+        return redirect(url_for('login'))
+
+    campaigns = sponsor.campaigns  # This accesses the campaigns associated with the sponsor
+    return render_template('campaigns.html', campaigns=campaigns) """
+    
 
 @app.route('/sp_find')
 def sp_find():
@@ -167,11 +177,47 @@ def sp_logout():
     return redirect(url_for('login'))
 
 
+@app.route('/campaigns')
+def campaigns():
+    sponsor_id = session.get('user_id')
+    if not sponsor_id:
+        return redirect(url_for('login'))
+
+    spnsr = sponsor.query.get(sponsor_id)
+    if sponsor is None:
+        return redirect(url_for('login'))
+
+    campaigns = spnsr.campaigns  # This accesses the campaigns associated with the sponsor
+    return render_template('campaigns.html', campaigns=campaigns)
+
+""" def campaigns():
+    sponsor_id = session.get('user_id')
+    if not sponsor_id:
+        return redirect(url_for('login'))
+
+    sponsor = Sponsor.query.get(sponsor_id)  # Fetch the Sponsor, not Campaign
+    if sponsor is None:
+        return redirect(url_for('login'))
+
+    campaigns = sponsor.campaigns  # Access the sponsor's campaigns via the relationship
+    return render_template('campaigns.html', campaigns=campaigns) """
+
+""" def campaigns():
+    sponsor_id = session.get('user_id')
+    if not sponsor_id:
+        return redirect(url_for('login'))
+
+    sponsor = Campaign.query.get(sponsor_id)
+    campaigns = sponsor.campaigns  # Access the sponsor's campaigns via the relationship
+
+    return render_template('campaigns.html', campaigns=campaigns) """
+
+
 @app.route('/create_camp', methods=['GET', 'POST'])
 def create_camp():
     if request.method == 'POST':
         name = request.form['name']
-        status = request.form['status']
+        category = request.form['category']
         budget = request.form['budget']  # Budget should be an integer (whole number)
         user_id = session.get('user_id')
         
@@ -180,17 +226,17 @@ def create_camp():
             return redirect(url_for('login'))
         
         # Fetch the sponsor by ID
-        sponsor = Sponsor.query.get(user_id)
-        if not sponsor:
+        spnsr = sponsor.query.get(user_id)
+        if not spnsr:
             flash('Sponsor not found.', 'danger')
             return redirect(url_for('login'))
 
         # Create new campaign
-        new_campaign = Campaign(name=name, status=status, budget=budget, sponsor_id=sponsor.id)
+        new_campaign = campaign(name=name, category=category, budget=budget, sponsor_id=spnsr.id)
         db.session.add(new_campaign)
         db.session.commit()
         flash('Campaign created successfully!', 'success')
-        return redirect(url_for('sp_home'))
+        return redirect(url_for('campaigns'))
 
     return render_template('create_camp.html')
 

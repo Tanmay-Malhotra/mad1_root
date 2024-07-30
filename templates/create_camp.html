@@ -59,10 +59,13 @@
         <h1>Create New Campaign</h1>
         <form method="post" action="{{ url_for('create_camp') }}">
             <input type="text" name="name" placeholder="Campaign Name" required>
-            <select name="status" required>
-                <option value="" disabled selected>Select Status</option>
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
+            <select name="category" required>
+                <option value="" disabled selected>Select category</option>
+                <option value="Technology">Technology</option>
+                <option value="Healthcare">Healthcare</option>
+                <option value="Finance">Finance</option>
+                <option value="Education">Education</option>
+                <option value="Other">Other</option>
             </select>
             <input type="number" name="budget" placeholder="Budget" required min="0">
             <button type="submit" class="btn">Create Campaign</button>
