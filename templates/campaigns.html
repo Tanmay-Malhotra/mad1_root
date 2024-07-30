@@ -97,6 +97,8 @@
                 <h2>{{ campaign.name }}</h2>
                 <p>Status: {{ campaign.status }}</p>
                 <p>Budget: {{ campaign.budget }}</p>
+                <p>Start Date: {{ campaign.start_date.strftime('%Y-%m-%d') if campaign.start_date else 'Not specified' }}</p>
+                <p>End Date: {{ campaign.end_date.strftime('%Y-%m-%d') if campaign.end_date else 'Not specified' }}</p>
             </div>
         {% endfor %}
         <a href="{{ url_for('create_camp') }}" class="btn-create">Create New Campaign</a>

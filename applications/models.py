@@ -16,6 +16,8 @@ class campaign(db.Model):
     category = db.Column(db.String(50), nullable=False)  
     budget = db.Column(db.Integer, nullable=False)
     sponsor_id = db.Column(db.Integer, db.ForeignKey('sponsor.id'), nullable=False)
+    start_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date, nullable=True)
     
     sponsor = db.relationship('sponsor', backref=db.backref('campaigns', lazy=True))
 

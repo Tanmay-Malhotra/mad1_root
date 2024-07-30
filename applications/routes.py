@@ -1,5 +1,6 @@
 from flask import render_template, request, redirect, url_for, flash, session
 from flask import current_app as app
+from datetime import date
 from applications.database import db
 from applications.models import influencer,sponsor,campaign
 from sqlalchemy import desc
@@ -218,6 +219,46 @@ def create_camp():
     if request.method == 'POST':
         name = request.form['name']
         category = request.form['category']
+        budget = int(request.form['budget'])  # Budget should be an integer (whole number)
+        start_date = request.form.get('start_date')  # Get the start date from the form
+        end_date = request.form.get('end_date')  # Get the end date from the form
+        user_id = session.get('user_id')
+
+        if not user_id:
+            flash('You need to log in first.', 'warning')
+            return redirect(url_for('login'))
+
+        # Fetch the sponsor by ID
+        spnsr = sponsor.query.get(user_id)
+        if not spnsr:
+            flash('Sponsor not found.', 'danger')
+            return redirect(url_for('login'))
+
+        # Convert the start_date and end_date to date objects if provided
+        start_date = date.fromisoformat(start_date) if start_date else None
+        end_date = date.fromisoformat(end_date) if end_date else None
+
+        # Create new campaign
+        new_campaign = campaign(
+            name=name,
+            category=category,
+            budget=budget,
+            sponsor_id=spnsr.id,
+            start_date=start_date,
+            end_date=end_date
+        )
+        db.session.add(new_campaign)
+        db.session.commit()
+        flash('Campaign created successfully!', 'success')
+        return redirect(url_for('campaigns'))
+
+    return render_template('create_camp.html')
+
+""" @app.route('/create_camp', methods=['GET', 'POST'])
+def create_camp():
+    if request.method == 'POST':
+        name = request.form['name']
+        category = request.form['category']
         budget = request.form['budget']  # Budget should be an integer (whole number)
         user_id = session.get('user_id')
         
@@ -239,4 +280,4 @@ def create_camp():
         return redirect(url_for('campaigns'))
 
     return render_template('create_camp.html')
-
+ """
