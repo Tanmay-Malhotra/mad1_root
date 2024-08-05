@@ -4,6 +4,7 @@ from datetime import datetime
 
 class sponsor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False) 
     email = db.Column(db.String(100), unique=True, nullable=False)
@@ -25,8 +26,13 @@ class influencer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
-    password = db.Column(db.String(100), nullable=False)  
+    password = db.Column(db.String(100), nullable=False)
+    industry = db.Column(db.String(100),nullable = False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     platform = db.Column(db.String(100))  
+    followers = db.Column(db.Integer, nullable=False)
+
+#class admanagement(db.Model):
+    #id = db.Column(db.Integer, primary_key=True)
 
 

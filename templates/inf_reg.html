@@ -59,6 +59,10 @@
         .container form button:hover {
             background-color: #0056b3;
         }
+        .flash-messages {
+            margin-bottom: 20px;
+            color: red;
+        }
     </style>
     <script>
         function selectPlatform(button) {
@@ -72,16 +76,38 @@
 <body>
     <div class="container">
         <h2>Influencer Registration</h2>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+        
         <form action="{{ url_for('inf_reg') }}" method="POST">
+            <input type="text" name="name" placeholder="Name" required>
             <input type="text" name="username" placeholder="Username" required>
             <input type="password" name="password" placeholder="Password" required>
             <input type="email" name="email" placeholder="Email" required>
+            <select name="industry" required>
+                <option value="" disabled selected>Select Industry</option>
+                <option value="Technology">Technology</option>
+                <option value="Healthcare">Healthcare</option>
+                <option value="Finance">Finance</option>
+                <option value="Education">Education</option>
+                <option value="Other">Other</option>
+            </select>
             <input type="hidden" id="platform" name="platform" required>
             <div class="platform-buttons">
                 <button type="button" value="YouTube" onclick="selectPlatform(this)">YouTube</button>
                 <button type="button" value="Twitter" onclick="selectPlatform(this)">Twitter</button>
                 <button type="button" value="Instagram" onclick="selectPlatform(this)">Instagram</button>
             </div>
+            <input type="number" name="followers" placeholder="Followers" required>
+
             <button type="submit">Register</button>
         </form>
     </div>

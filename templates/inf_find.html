@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Campaigns</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f9f9f9;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Find Campaigns</h2>
+        <form method="GET" action="{{ url_for('inf_find') }}">
+            <div class="form-group">
+                <label for="industry">Sort by Industry:</label>
+                <select name="industry" id="industry" onchange="this.form.submit()">
+                    <option value="">-- Select Industry --</option>
+                    {% for industry in ['Technology', 'Fashion', 'Food', 'Travel', 'Health'] %}
+                        <option value="{{ industry }}" {% if selected_industry == industry %}selected{% endif %}>{{ industry }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+        <table>
+            <thead>
+                <tr>
+                    <th>Campaign Name</th>
+                    <th>Sponsor Name</th>
+                    <th>Industry</th>
+                    <th>Platform</th>
+                    <th>Status</th>
+                    <th>Budget</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for campaign in campaigns %}
+                    <tr>
+                        <td>{{ campaign.name }}</td>
+                        <td>{{ campaign.sponsor.username }}</td>  <!-- Accessing the sponsor's username -->
+                        <td>{{ campaign.sponsor.industry }}</td>  <!-- Assuming you have the industry in the sponsor model -->
+                        <td>{{ campaign.sponsor.platform }}</td>  <!-- Assuming you have the platform in the sponsor model -->
+                        <td>{{ campaign.status }}</td>
+                        <td>${{ campaign.budget }}</td>
+                        <td>{{ campaign.start_date }}</td>
+                        <td>{{ campaign.end_date if campaign.end_date else 'N/A' }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

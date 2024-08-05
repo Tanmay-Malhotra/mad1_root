@@ -5,7 +5,6 @@ from applications.database import db
 from applications.models import influencer,sponsor,campaign
 from sqlalchemy import desc
 
-
 @app.route('/')
 def home():
     return render_template('login.html')
@@ -31,7 +30,7 @@ def login():
         if user and user.password == password:
             session['user_id'] = user.id
             flash('Login successful!', 'success')
-            return redirect(url_for('in_home'))  # Redirect to influencer homepage
+            return redirect(url_for('inf_home'))  # Redirect to influencer homepage
         
         # If no matching user found or password incorrect
         flash('Invalid username or password. Please try again.', 'danger')
@@ -40,38 +39,80 @@ def login():
 
 
 
-
+#-----------------------------------------------INFLUENCER--------------------------------------------------------------
 
 
 
 @app.route('/inf_reg', methods=['GET', 'POST'])
 def inf_reg():
     if request.method == 'POST':
-            username = request.form.get('username')
-            name = request.form.get('name')
-            email = request.form.get('email')
-            password = request.form.get('password')
+        name = request.form.get('name')
+        username = request.form.get('username')
+        password = request.form.get('password')
+        industry = request.form.get('industry')  # Ensure this is captured
+        email = request.form.get('email')
+        platform = request.form.get('platform')
+        followers = request.form.get('followers')
 
-            #checking if email is taken or not
-            existing_user = influencer.query.filter_by(username=username).first()
-            existing_email = influencer.query.filter_by(email=email).first()
-            if existing_user:
-                flash('Username is already is in use, Please choose a different one.', 'danger')
-                return redirect(url_for('inf_reg'))
-            if existing_email:
-                flash('Email is already in use by a diffrent user', 'danger')
-                return redirect(url_for('inf_reg'))
+        #checking if email is taken or not
+        existing_user_influencer = influencer.query.filter_by(username=username).first()
+        existing_user_sponsor = sponsor.query.filter_by(username=username).first()
+
+        # Check for existing email in both tables
+        existing_email_influencer = influencer.query.filter_by(email=email).first()
+        existing_email_sponsor = sponsor.query.filter_by(email=email).first()
+        if existing_user_influencer or existing_user_sponsor:
+            flash('Username is already is in use, Please choose a different one.', 'danger')
+            return redirect(url_for('inf_reg'))
+        if existing_email_sponsor or existing_email_influencer:
+            flash('Email is already in use by a diffrent user', 'danger')
+            return redirect(url_for('inf_reg'))
 
 
-            #creating the new user with hashed password 
-            new_user = influencer(username=username, name=name, email=email, password=password)
-            db.session.add(new_user)
-            db.session.commit()
-
-            flash('Your account has been created!', 'success')
-            return redirect(url_for('login'))
+        #creating the new user with hashed password 
+        new_user = influencer(username=username, name=name, email=email, password=password, industry=industry, platform=platform, followers = followers)
+        db.session.add(new_user)
+        db.session.commit()
+        flash('Your account has been created!', 'success')
+        return redirect(url_for('login'))
 
     return render_template('inf_reg.html')
+
+
+
+
+def get_current_influencer():
+    influencer_id = session.get('user_id')
+    #print(f"Current sponsor ID in session: {sponsor_id}")
+    if influencer_id:
+        return influencer.query.get(influencer_id)
+    return None
+
+@app.route('/inf_home')
+def inf_home():
+
+    inf = get_current_influencer()
+    if inf:
+        return render_template('inf_home.html', influencer=inf)
+    return redirect(url_for('login'))
+
+@app.route('/inf_find', methods=['GET'])
+def inf_find():
+    selected_industry = request.args.get('industry', None)
+    
+    # If an industry is selected, filter campaigns by that industry
+    if selected_industry:
+        campaigns = campaign.query.join(sponsor).filter(sponsor.industry == selected_industry).order_by(
+            db.case(
+                (sponsor.industry == selected_industry, 0),  # Selected industry at the top
+                (sponsor.industry != selected_industry, 1),  # Others follow
+                else_=2
+            )
+        ).all()
+    else:
+        campaigns = campaign.query.all()  # Get all campaigns if no industry is selected
+
+    return render_template('inf_find.html', campaigns=campaigns, selected_industry=selected_industry)
 
 
 
@@ -165,9 +206,7 @@ def sp_campaigns():
     return render_template('campaigns.html', campaigns=campaigns) """
     
 
-@app.route('/sp_find')
-def sp_find():
-    return render_template('sp_find.html')
+
 
 @app.route('/sp_statistics')
 def sp_statistics():
@@ -253,6 +292,55 @@ def create_camp():
         return redirect(url_for('campaigns'))
 
     return render_template('create_camp.html')
+
+@app.route('/campaign_mgmt/<int:campaign_id>')
+def campaign_mgmt(campaign_id):
+    cmp = campaign.query.get_or_404(campaign_id)
+    return render_template('campaign_mgmt.html', campaign=cmp)
+
+@app.route('/update_campaign/<int:campaign_id>', methods=['POST'])
+def update_campaign(campaign_id):
+    cmp = campaign.query.get_or_404(campaign_id)
+    
+    # Update campaign details from form data
+    cmp.name = request.form['name']
+    cmp.status = request.form['status']
+    cmp.category = request.form['category']
+    cmp.budget = int(request.form['budget'])
+    cmp.start_date = date.fromisoformat(request.form['start_date']) if request.form['start_date'] else None
+    cmp.end_date = date.fromisoformat(request.form['end_date']) if request.form['end_date'] else None
+
+    db.session.commit()
+    flash('Campaign updated successfully!', 'success')
+    return redirect(url_for('campaigns'))
+
+#### Delete Campaign Route
+
+@app.route('/delete_campaign/<int:campaign_id>', methods=['POST'])
+def delete_campaign(campaign_id):
+    cmp = campaign.query.get_or_404(campaign_id)
+    db.session.delete(cmp)
+    db.session.commit()
+    flash('Campaign deleted successfully!', 'success')
+    return redirect(url_for('campaigns'))
+
+
+
+@app.route('/sp_find', methods=['GET'])
+def sp_find():
+    selected_industry = request.args.get('industry', None)
+    if selected_industry:
+        influencers = influencer.query.order_by(
+            db.case(
+                (influencer.industry == selected_industry, 0),  # Selected industry at the top
+                (influencer.industry != selected_industry, 1),  # Others follow
+                else_=2
+            ),
+        ).all()
+    else:
+        influencers = influencer.query.all()
+    return render_template('sp_find.html', influencers=influencers, selected_industry=selected_industry)
+
 
 """ @app.route('/create_camp', methods=['GET', 'POST'])
 def create_camp():

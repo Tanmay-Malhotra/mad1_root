@@ -1,0 +1,157 @@
+=<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campaign Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+        }
+
+        nav .left {
+            font-weight: bold;
+        }
+
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        nav ul li {
+            margin-left: 20px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .campaign-details {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        input, select {
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+        }
+
+        .btn-delete:hover {
+            background-color: #c82333;
+        }
+
+        .btn-back {
+            background-color: #6c757d;
+        }
+
+        .btn-back:hover {
+            background-color: #5a6268;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="left">Sponsor @ SPOC</div>
+        <ul>
+            <li><a href="{{ url_for('sp_home') }}">Profile</a></li>
+            <li><a href="{{ url_for('campaigns') }}">Campaigns</a></li>
+            <li><a href="{{ url_for('sp_find') }}">Find</a></li>
+            <li><a href="{{ url_for('sp_statistics') }}">Statistics</a></li>
+            <li><a href="{{ url_for('sp_logout') }}">Logout</a></li>
+        </ul>
+    </nav>
+    <div class="content">
+        <div class="campaign-details">
+            <h1>Campaign Management</h1>
+            <form method="post" action="{{ url_for('update_campaign', campaign_id=campaign.id) }}">
+                <label for="name">Campaign Name:</label>
+                <input type="text" id="name" name="name" value="{{ campaign.name }}" required>
+                
+                <label for="status">Status:</label>
+                <select id="status" name="status" required>
+                    <option value="active" {{ 'selected' if campaign.status == 'active' }}>Active</option>
+                    <option value="inactive" {{ 'selected' if campaign.status == 'inactive' }}>Inactive</option>
+                </select>
+
+                <label for="category">Category:</label>
+                <select id="category" name="category" required>
+                    <option value="Technology" {{ 'selected' if campaign.category == 'Technology' }}>Technology</option>
+                    <option value="Healthcare" {{ 'selected' if campaign.category == 'Healthcare' }}>Healthcare</option>
+                    <option value="Finance" {{ 'selected' if campaign.category == 'Finance' }}>Finance</option>
+                    <option value="Education" {{ 'selected' if campaign.category == 'Education' }}>Education</option>
+                    <option value="Other" {{ 'selected' if campaign.category == 'Other' }}>Other</option>
+                </select>
+
+                <label for="budget">Budget:</label>
+                <input type="number" id="budget" name="budget" value="{{ campaign.budget }}" required min="0">
+                
+                <label for="start_date">Start Date:</label>
+                <input type="date" id="start_date" name="start_date" value="{{ campaign.start_date.strftime('%Y-%m-%d') if campaign.start_date else '' }}" required>
+                
+                <label for="end_date">End Date:</label>
+                <input type="date" id="end_date" name="end_date" value="{{ campaign.end_date.strftime('%Y-%m-%d') if campaign.end_date else '' }}">
+
+                <div class="btn-container">
+                    <button type="submit" class="btn">Update Campaign</button>
+                </div>
+            </form>
+            <form method="post" action="{{ url_for('delete_campaign', campaign_id=campaign.id) }}" style="margin-top: 10px;">
+                <button type="submit" class="btn btn-delete">Delete Campaign</button>
+            </form>
+            <a href="{{ url_for('campaigns') }}" class="btn btn-back">Back to Campaigns</a>
+        </div>
+    </div>
+</body>
+</html>
