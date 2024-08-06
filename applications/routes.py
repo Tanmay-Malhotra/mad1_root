@@ -2,7 +2,7 @@ from flask import render_template, request, redirect, url_for, flash, session
 from flask import current_app as app
 from datetime import date
 from applications.database import db
-from applications.models import influencer,sponsor,campaign
+from applications.models import influencer,sponsor,campaign,adrequest
 from sqlalchemy import desc
 
 @app.route('/')
@@ -115,6 +115,30 @@ def inf_find():
     return render_template('inf_find.html', campaigns=campaigns, selected_industry=selected_industry)
 
 
+@app.route('/inf_request_ad/<int:campaign_id>', methods=['GET', 'POST'])
+def inf_request_ad(campaign_id):
+    cmp = campaign.query.get_or_404(campaign_id)
+    inf = get_current_influencer()  # Assuming you have a function to get the current logged-in influencer
+
+    if request.method == 'POST':
+        requirements = request.form['requirements']
+        payment_amount = float(request.form['payment_amount'])
+        status = 'Request Sent'
+
+        new_ad_request = adrequest(
+            campaign_id=campaign_id,
+            influencer_id=inf.id,
+            requirements=requirements,
+            payment_amount=payment_amount,
+            status=status
+        )
+        db.session.add(new_ad_request)
+        db.session.commit()
+        flash('Ad request sent successfully!', 'success')
+        return redirect(url_for('inf_find'))
+
+    return render_template('inf_request_ad.html', campaign=cmp, influencer=inf)
+
 
 
 
@@ -204,7 +228,38 @@ def sp_campaigns():
 
     campaigns = sponsor.campaigns  # This accesses the campaigns associated with the sponsor
     return render_template('campaigns.html', campaigns=campaigns) """
-    
+
+@app.route('/ad_request/<int:influencer_id>', methods=['GET', 'POST'])
+def ad_request(influencer_id):
+    inf = influencer.query.get_or_404(influencer_id)
+    campaigns = campaign.query.all()  # Fetch all campaigns for selection
+
+    if request.method == 'POST':
+        campaign_id = request.form['campaign_id']
+        requirements = request.form['requirements']
+        payment_amount = float(request.form['payment_amount'])
+        status = request.form['status']
+
+        new_ad_request = adrequest(
+            campaign_id=campaign_id,
+            influencer_id=influencer_id,
+            requirements=requirements,
+            payment_amount=payment_amount,
+            status=status
+        )
+        db.session.add(new_ad_request)
+        db.session.commit()
+        flash('Ad request sent successfully!', 'success')
+        return redirect(url_for('sp_find'))
+
+    return render_template('ad_request.html', influencer=inf, campaigns=campaigns)
+
+@app.route('/campaign/<int:campaign_id>/ad_request', methods=['GET'])
+def view_ad_request(campaign_id):
+    cmp = campaign.query.get_or_404(campaign_id)
+    ad_requests = adrequest.query.filter_by(campaign_id=campaign_id).all()
+    return render_template('view_ad_request.html', campaign=cmp, ad_requests=ad_requests)
+
 
 
 
@@ -340,6 +395,8 @@ def sp_find():
     else:
         influencers = influencer.query.all()
     return render_template('sp_find.html', influencers=influencers, selected_industry=selected_industry)
+
+
 
 
 """ @app.route('/create_camp', methods=['GET', 'POST'])

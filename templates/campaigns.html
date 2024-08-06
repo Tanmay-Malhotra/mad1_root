@@ -56,6 +56,10 @@
             align-items: center;
         }
 
+        .campaign-details {
+            flex: 1;
+        }
+
         .campaign h2 {
             margin-top: 0;
         }
@@ -81,19 +85,36 @@
             background-color: #0056b3;
         }
 
-        .btn-view {
+        .btn-view, .btn-edit {
             padding: 8px 16px;
             color: white;
-            background-color: #28a745;
             border: none;
             border-radius: 5px;
             text-decoration: none;
             font-size: 14px;
             cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .btn-view {
+            background-color: #28a745;
         }
 
         .btn-view:hover {
             background-color: #218838;
+        }
+
+        .btn-edit {
+            background-color: #ffc107;
+        }
+
+        .btn-edit:hover {
+            background-color: #e0a800;
+        }
+
+        .button-group {
+            display: flex;
+            align-items: center;
         }
     </style>
 </head>
@@ -102,7 +123,7 @@
         <div class="left">Sponsor @ SPOC</div>
         <ul>
             <li><a href="{{ url_for('sp_home') }}">Profile</a></li>
-            <li><a href="{{ url_for('campaigns') }}" class ="active">Campaigns</a></li>
+            <li><a href="{{ url_for('campaigns') }}" class="active">Campaigns</a></li>
             <li><a href="{{ url_for('sp_find') }}">Find</a></li>
             <li><a href="{{ url_for('sp_statistics') }}">Statistics</a></li>
             <li><a href="{{ url_for('sp_logout') }}">Logout</a></li>
@@ -120,7 +141,10 @@
                     <p>Start Date: {{ campaign.start_date.strftime('%Y-%m-%d') if campaign.start_date else 'Not specified' }}</p>
                     <p>End Date: {{ campaign.end_date.strftime('%Y-%m-%d') if campaign.end_date else 'Not specified' }}</p>
                 </div>
-                <a href="{{ url_for('campaign_mgmt', campaign_id=campaign.id) }}" class="btn-view">View</a>
+                <div class="button-group">
+                    <a href="{{ url_for('campaign_mgmt', campaign_id=campaign.id) }}" class="btn-view">Edit</a>
+                    <a href="{{ url_for('view_ad_request', campaign_id=campaign.id) }}" class="btn-view">View Ad Requests</a>
+                </div>
             </div>
         {% endfor %}
         <a href="{{ url_for('create_camp') }}" class="btn-create">Create New Campaign</a>

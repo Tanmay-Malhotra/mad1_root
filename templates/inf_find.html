@@ -36,6 +36,21 @@
         .form-group {
             margin-bottom: 20px;
         }
+        .button {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -63,6 +78,7 @@
                     <th>Budget</th>
                     <th>Start Date</th>
                     <th>End Date</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -76,6 +92,9 @@
                         <td>${{ campaign.budget }}</td>
                         <td>{{ campaign.start_date }}</td>
                         <td>{{ campaign.end_date if campaign.end_date else 'N/A' }}</td>
+                        <td>
+                            <a href="{{ url_for('inf_request_ad', campaign_id=campaign.id) }}" class="button">Request Ad</a>
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>

@@ -36,6 +36,17 @@
         .form-group {
             margin-bottom: 20px;
         }
+        .button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -60,6 +71,7 @@
                     <th>Email</th>
                     <th>Industry</th>
                     <th>Platform</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -70,6 +82,9 @@
                         <td>{{ influencer.email }}</td>
                         <td>{{ influencer.industry }}</td>
                         <td>{{ influencer.platform }}</td>
+                        <td>
+                            <a href="{{ url_for('ad_request', influencer_id=influencer.id) }}" class="button">Send Ad Request</a>
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
