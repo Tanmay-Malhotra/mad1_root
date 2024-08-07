@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Send Ad Request</title>
+    <title>Send Ad Request to {{ influencer.username }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -63,15 +63,6 @@
             <div class="form-group">
                 <label for="payment_amount">Payment Amount:</label>
                 <input type="number" step="0.01" name="payment_amount" id="payment_amount" required>
-            </div>
-            <div class="form-group">
-                <label for="status">Status:</label>
-                <select name="status" id="status" required>
-                    <option value="Request Sent">Request Sent</option>
-                    <option value="Request Negotiated">Request Negotiated</option>
-                    <option value="Request Accepted">Request Accepted</option>
-                    <option value="Request Denied">Request Denied</option>
-                </select>
             </div>
             <button type="submit">Send Ad Request</button>
         </form>

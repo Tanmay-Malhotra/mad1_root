@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ad Requests for {{ campaign.name }}</title>
+    <title>Ad Management for {{ influencer.username }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -39,18 +39,45 @@
         .section h3 {
             margin-top: 0;
         }
+        .btn {
+            padding: 5px 10px;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .btn-accept {
+            background-color: #28a745;
+        }
+        .btn-accept:hover {
+            background-color: #218838;
+        }
+        .btn-reject {
+            background-color: #dc3545;
+        }
+        .btn-reject:hover {
+            background-color: #c82333;
+        }
+        .btn-negotiate {
+            background-color: #ffc107;
+        }
+        .btn-negotiate:hover {
+            background-color: #e0a800;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Ad Requests for Campaign: {{ campaign.name }}</h2>
+        <h2>Ad Management for {{ influencer.username }}</h2>
         
         <div class="section">
             <h3>New Negotiations</h3>
             <table>
                 <thead>
                     <tr>
-                        <th>Influencer Name</th>
+                        <th>Campaign Name</th>
                         <th>Requirements</th>
                         <th>Payment Amount</th>
                         <th>Status</th>
@@ -59,7 +86,7 @@
                 <tbody>
                     {% for ad_request in new_negotiations %}
                         <tr>
-                            <td>{{ ad_request.influencer.username }}</td>
+                            <td>{{ ad_request.campaign.name }}</td>
                             <td>{{ ad_request.requirements }}</td>
                             <td>${{ ad_request.payment_amount }}</td>
                             <td>{{ ad_request.status }}</td>
@@ -74,19 +101,29 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Influencer Name</th>
+                        <th>Campaign Name</th>
                         <th>Requirements</th>
                         <th>Payment Amount</th>
                         <th>Status</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for ad_request in pending_requests %}
                         <tr>
-                            <td>{{ ad_request.influencer.username }}</td>
+                            <td>{{ ad_request.campaign.name }}</td>
                             <td>{{ ad_request.requirements }}</td>
                             <td>${{ ad_request.payment_amount }}</td>
                             <td>{{ ad_request.status }}</td>
+                            <td>
+                                <form method="POST" action="{{ url_for('accept_ad_request', ad_request_id=ad_request.id) }}" style="display:inline;">
+                                    <button type="submit" class="btn btn-accept">Accept</button>
+                                </form>
+                                <form method="POST" action="{{ url_for('reject_ad_request', ad_request_id=ad_request.id) }}" style="display:inline;">
+                                    <button type="submit" class="btn btn-reject">Reject</button>
+                                </form>
+                                <button class="btn btn-negotiate">Negotiate</button>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -98,7 +135,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Influencer Name</th>
+                        <th>Campaign Name</th>
                         <th>Requirements</th>
                         <th>Payment Amount</th>
                         <th>Status</th>
@@ -107,7 +144,7 @@
                 <tbody>
                     {% for ad_request in active_requests %}
                         <tr>
-                            <td>{{ ad_request.influencer.username }}</td>
+                            <td>{{ ad_request.campaign.name }}</td>
                             <td>{{ ad_request.requirements }}</td>
                             <td>${{ ad_request.payment_amount }}</td>
                             <td>{{ ad_request.status }}</td>
@@ -122,7 +159,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Influencer Name</th>
+                        <th>Campaign Name</th>
                         <th>Requirements</th>
                         <th>Payment Amount</th>
                         <th>Status</th>
@@ -131,7 +168,7 @@
                 <tbody>
                     {% for ad_request in rejected_requests %}
                         <tr>
-                            <td>{{ ad_request.influencer.username }}</td>
+                            <td>{{ ad_request.campaign.name }}</td>
                             <td>{{ ad_request.requirements }}</td>
                             <td>${{ ad_request.payment_amount }}</td>
                             <td>{{ ad_request.status }}</td>

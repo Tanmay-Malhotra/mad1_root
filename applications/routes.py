@@ -99,45 +99,93 @@ def inf_home():
 @app.route('/inf_find', methods=['GET'])
 def inf_find():
     selected_industry = request.args.get('industry', None)
-    
-    # If an industry is selected, filter campaigns by that industry
-    if selected_industry:
-        campaigns = campaign.query.join(sponsor).filter(sponsor.industry == selected_industry).order_by(
-            db.case(
-                (sponsor.industry == selected_industry, 0),  # Selected industry at the top
-                (sponsor.industry != selected_industry, 1),  # Others follow
-                else_=2
-            )
-        ).all()
-    else:
-        campaigns = campaign.query.all()  # Get all campaigns if no industry is selected
+    search_query = request.args.get('search', None)
 
-    return render_template('inf_find.html', campaigns=campaigns, selected_industry=selected_industry)
+    query = campaign.query.join(sponsor)
+    
+    # Filter by industry if selected
+    if selected_industry:
+        query = query.filter(sponsor.industry == selected_industry)
+
+    # Filter by search query if provided
+    if search_query:
+        search_filter = (campaign.name.ilike(f'%{search_query}%') | 
+                         sponsor.username.ilike(f'%{search_query}%'))
+        query = query.filter(search_filter)
+
+    campaigns = query.order_by(
+        db.case(
+            (sponsor.industry == selected_industry, 0),  # Selected industry at the top
+            (sponsor.industry != selected_industry, 1),  # Others follow
+            else_=2
+        )
+    ).all()
+
+    return render_template('inf_find.html', campaigns=campaigns, selected_industry=selected_industry, search_query=search_query)
+
+
+
+
+@app.route('/ad_management')
+def ad_management():
+    influencer_id = session.get('user_id')
+    if not influencer_id:
+        return redirect(url_for('login'))
+
+    inf = influencer.query.get(influencer_id)
+    if inf is None:
+        return redirect(url_for('login'))
+
+    ad_requests = adrequest.query.filter_by(influencer_id=influencer_id).all()
+
+    new_negotiations = [req for req in ad_requests if req.status == 'Request Negotiated']
+    pending_requests = [req for req in ad_requests if req.status == 'Request Sent']
+    active_requests = [req for req in ad_requests if req.status == 'Request Accepted']
+    rejected_requests = [req for req in ad_requests if req.status == 'Request Rejected']
+
+    return render_template('ad_management.html', influencer=inf, new_negotiations=new_negotiations, pending_requests=pending_requests, active_requests=active_requests, rejected_requests=rejected_requests)
+
+
+@app.route('/ad_request/<int:ad_request_id>/accept', methods=['POST'])
+def accept_ad_request(ad_request_id):
+    ad_request = adrequest.query.get_or_404(ad_request_id)
+    ad_request.status = 'Request Accepted'
+    db.session.commit()
+    flash('Ad request accepted.', 'success')
+    return redirect(url_for('ad_management'))
+
+
+@app.route('/ad_request/<int:ad_request_id>/reject', methods=['POST'])
+def reject_ad_request(ad_request_id):
+    ad_request = adrequest.query.get_or_404(ad_request_id)
+    ad_request.status = 'Request Rejected'
+    db.session.commit()
+    flash('Ad request rejected.', 'success')
+    return redirect(url_for('ad_management'))
 
 
 @app.route('/inf_request_ad/<int:campaign_id>', methods=['GET', 'POST'])
 def inf_request_ad(campaign_id):
+    inf = influencer.query.get(session['user_id'])
     cmp = campaign.query.get_or_404(campaign_id)
-    inf = get_current_influencer()  # Assuming you have a function to get the current logged-in influencer
-
+    
     if request.method == 'POST':
         requirements = request.form['requirements']
         payment_amount = float(request.form['payment_amount'])
-        status = 'Request Sent'
-
+        
         new_ad_request = adrequest(
             campaign_id=campaign_id,
             influencer_id=inf.id,
             requirements=requirements,
             payment_amount=payment_amount,
-            status=status
+            status='Request Sent'
         )
         db.session.add(new_ad_request)
         db.session.commit()
         flash('Ad request sent successfully!', 'success')
-        return redirect(url_for('inf_find'))
-
-    return render_template('inf_request_ad.html', campaign=cmp, influencer=inf)
+        return redirect(url_for('ad_management'))
+    
+    return render_template('inf_request_ad.html', campaign=cmp)
 
 
 
@@ -229,7 +277,7 @@ def sp_campaigns():
     campaigns = sponsor.campaigns  # This accesses the campaigns associated with the sponsor
     return render_template('campaigns.html', campaigns=campaigns) """
 
-@app.route('/ad_request/<int:influencer_id>', methods=['GET', 'POST'])
+""" @app.route('/ad_request/<int:influencer_id>', methods=['GET', 'POST'])
 def ad_request(influencer_id):
     inf = influencer.query.get_or_404(influencer_id)
     campaigns = campaign.query.all()  # Fetch all campaigns for selection
@@ -238,14 +286,46 @@ def ad_request(influencer_id):
         campaign_id = request.form['campaign_id']
         requirements = request.form['requirements']
         payment_amount = float(request.form['payment_amount'])
-        status = request.form['status']
+
+        new_ad_request = adrequest(
+            campaign_id=campaign_id,
+            influencer_id=influencer_id,
+            requirements=requirements,
+            payment_amount=payment_amount
+        )
+        db.session.add(new_ad_request)
+        db.session.commit()
+        flash('Ad request sent successfully!', 'success')
+        return redirect(url_for('sp_find'))
+
+    return render_template('ad_request.html', influencer=inf, campaigns=campaigns) """
+
+@app.route('/ad_request/<int:influencer_id>', methods=['GET', 'POST'])
+def ad_request(influencer_id):
+    inf = influencer.query.get_or_404(influencer_id)
+    current_sponsor = get_current_sponsor()
+    if not current_sponsor:
+        flash('You need to be logged in to send an ad request.', 'danger')
+        return redirect(url_for('login'))  # Assuming you have a login route
+
+    campaigns = campaign.query.filter_by(sponsor_id=current_sponsor.id).all()  # Fetch only campaigns created by the current sponsor
+
+    if not campaigns:
+        flash('You need to create a campaign before sending an ad request.', 'warning')
+        return redirect(url_for('create_camp'))  # Assuming you have a route to create a campaign
+
+    if request.method == 'POST':
+        campaign_id = request.form['campaign_id']
+        requirements = request.form['requirements']
+        payment_amount = float(request.form['payment_amount'])
 
         new_ad_request = adrequest(
             campaign_id=campaign_id,
             influencer_id=influencer_id,
             requirements=requirements,
             payment_amount=payment_amount,
-            status=status
+            sponsor_id=current_sponsor.id,
+            status='request sent'
         )
         db.session.add(new_ad_request)
         db.session.commit()
@@ -254,13 +334,27 @@ def ad_request(influencer_id):
 
     return render_template('ad_request.html', influencer=inf, campaigns=campaigns)
 
-@app.route('/campaign/<int:campaign_id>/ad_request', methods=['GET'])
+
+
+
+""" @app.route('/campaign/<int:campaign_id>/ad_request', methods=['GET'])
 def view_ad_request(campaign_id):
     cmp = campaign.query.get_or_404(campaign_id)
     ad_requests = adrequest.query.filter_by(campaign_id=campaign_id).all()
-    return render_template('view_ad_request.html', campaign=cmp, ad_requests=ad_requests)
+    return render_template('view_ad_request.html', campaign=cmp, ad_requests=ad_requests) """
 
 
+@app.route('/campaign/<int:campaign_id>/ad_requests', methods=['GET'])
+def view_ad_request(campaign_id):
+    cmp = campaign.query.get_or_404(campaign_id)
+    ad_requests = adrequest.query.filter_by(campaign_id=campaign_id).all()
+
+    new_negotiations = [req for req in ad_requests if req.status == 'Request Negotiated']
+    pending_requests = [req for req in ad_requests if req.status == 'Request Sent']
+    active_requests = [req for req in ad_requests if req.status == 'Request Accepted']
+    rejected_requests = [req for req in ad_requests if req.status == 'Request Rejected']
+
+    return render_template('view_ad_request.html', campaign=cmp, new_negotiations=new_negotiations, pending_requests=pending_requests, active_requests=active_requests, rejected_requests=rejected_requests)
 
 
 @app.route('/sp_statistics')
@@ -371,12 +465,28 @@ def update_campaign(campaign_id):
 
 #### Delete Campaign Route
 
-@app.route('/delete_campaign/<int:campaign_id>', methods=['POST'])
+""" @app.route('/delete_campaign/<int:campaign_id>', methods=['POST'])
 def delete_campaign(campaign_id):
     cmp = campaign.query.get_or_404(campaign_id)
     db.session.delete(cmp)
     db.session.commit()
     flash('Campaign deleted successfully!', 'success')
+    return redirect(url_for('campaigns'))
+ """
+
+@app.route('/delete_campaign/<int:campaign_id>', methods=['POST'])
+def delete_campaign(campaign_id):
+    cmp = campaign.query.get_or_404(campaign_id)
+    
+    # Find all related adrequests and delete them
+    related_adrequests = adrequest.query.filter_by(campaign_id=campaign_id).all()
+    for adreq in related_adrequests:
+        db.session.delete(adreq)
+    
+    db.session.delete(cmp)
+    db.session.commit()
+    
+    flash('Campaign and related ad requests deleted successfully!', 'success')
     return redirect(url_for('campaigns'))
 
 

@@ -35,6 +35,9 @@
         }
         .form-group {
             margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         .button {
             display: inline-block;
@@ -51,6 +54,9 @@
         .button:hover {
             background-color: #0056b3;
         }
+        .search-box {
+            margin-left: 20px;
+        }
     </style>
 </head>
 <body>
@@ -58,13 +64,19 @@
         <h2>Find Campaigns</h2>
         <form method="GET" action="{{ url_for('inf_find') }}">
             <div class="form-group">
-                <label for="industry">Sort by Industry:</label>
-                <select name="industry" id="industry" onchange="this.form.submit()">
-                    <option value="">-- Select Industry --</option>
-                    {% for industry in ['Technology', 'Fashion', 'Food', 'Travel', 'Health'] %}
-                        <option value="{{ industry }}" {% if selected_industry == industry %}selected{% endif %}>{{ industry }}</option>
-                    {% endfor %}
-                </select>
+                <div>
+                    <label for="industry">Sort by Industry:</label>
+                    <select name="industry" id="industry" onchange="this.form.submit()">
+                        <option value="">-- Select Industry --</option>
+                        {% for industry in ['Technology', 'Fashion', 'Food', 'Travel', 'Health'] %}
+                            <option value="{{ industry }}" {% if selected_industry == industry %}selected{% endif %}>{{ industry }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="search-box">
+                    <label for="search">Search:</label>
+                    <input type="text" name="search" id="search" value="{{ search_query }}" placeholder="Search campaigns..." onkeypress="if(event.keyCode==13){this.form.submit();}">
+                </div>
             </div>
         </form>
         <table>
@@ -85,9 +97,9 @@
                 {% for campaign in campaigns %}
                     <tr>
                         <td>{{ campaign.name }}</td>
-                        <td>{{ campaign.sponsor.username }}</td>  <!-- Accessing the sponsor's username -->
-                        <td>{{ campaign.sponsor.industry }}</td>  <!-- Assuming you have the industry in the sponsor model -->
-                        <td>{{ campaign.sponsor.platform }}</td>  <!-- Assuming you have the platform in the sponsor model -->
+                        <td>{{ campaign.sponsor.username }}</td>
+                        <td>{{ campaign.sponsor.industry }}</td>
+                        <td>{{ campaign.sponsor.platform }}</td>
                         <td>{{ campaign.status }}</td>
                         <td>${{ campaign.budget }}</td>
                         <td>{{ campaign.start_date }}</td>

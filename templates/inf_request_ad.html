@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Request Ad</title>
+    <title>Request Ad for {{ campaign.name }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -25,7 +25,7 @@
             display: block;
             margin-bottom: 5px;
         }
-        input, textarea, select {
+        input, textarea {
             width: 100%;
             padding: 10px;
             border: 1px solid #ccc;
@@ -46,7 +46,7 @@
 </head>
 <body>
     <div class="container">
-        <h2>Request Ad for Campaign {{ campaign.name }}</h2>
+        <h2>Request Ad for {{ campaign.name }}</h2>
         <form method="POST">
             <div class="form-group">
                 <label for="requirements">Requirements:</label>
