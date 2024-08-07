@@ -324,8 +324,7 @@ def ad_request(influencer_id):
             influencer_id=influencer_id,
             requirements=requirements,
             payment_amount=payment_amount,
-            sponsor_id=current_sponsor.id,
-            status='request sent'
+            status='Request Sent'
         )
         db.session.add(new_ad_request)
         db.session.commit()
@@ -355,6 +354,28 @@ def view_ad_request(campaign_id):
     rejected_requests = [req for req in ad_requests if req.status == 'Request Rejected']
 
     return render_template('view_ad_request.html', campaign=cmp, new_negotiations=new_negotiations, pending_requests=pending_requests, active_requests=active_requests, rejected_requests=rejected_requests)
+
+@app.route('/ad_request/<int:ad_request_id>/edit', methods=['GET', 'POST'])
+def edit_ad_request(ad_request_id):
+    ad_req = adrequest.query.get_or_404(ad_request_id)
+    if request.method == 'POST':
+        ad_req.requirements = request.form['requirements']
+        ad_req.payment_amount = request.form['payment_amount']
+        db.session.commit()
+        flash('Ad request updated successfully!', 'success')
+        return redirect(url_for('view_ad_request', campaign_id=ad_req.campaign_id))
+
+    return render_template('edit_ad_request.html', ad_request=ad_req)
+
+@app.route('/ad_request/<int:ad_request_id>/delete', methods=['POST'])
+def delete_ad_request(ad_request_id):
+    ad_req = adrequest.query.get_or_404(ad_request_id)
+    campaign_id = ad_req.campaign_id
+    db.session.delete(ad_req)
+    db.session.commit()
+    flash('Ad request deleted successfully!', 'success')
+    return redirect(url_for('view_ad_request', campaign_id=campaign_id))
+
 
 
 @app.route('/sp_statistics')
@@ -491,7 +512,7 @@ def delete_campaign(campaign_id):
 
 
 
-@app.route('/sp_find', methods=['GET'])
+""" @app.route('/sp_find', methods=['GET'])
 def sp_find():
     selected_industry = request.args.get('industry', None)
     if selected_industry:
@@ -504,7 +525,36 @@ def sp_find():
         ).all()
     else:
         influencers = influencer.query.all()
-    return render_template('sp_find.html', influencers=influencers, selected_industry=selected_industry)
+    return render_template('sp_find.html', influencers=influencers, selected_industry=selected_industry) """
+
+@app.route('/sp_find', methods=['GET'])
+def sp_find():
+    selected_industry = request.args.get('industry', None)
+    search_query = request.args.get('search', None)
+
+    query = influencer.query
+    
+    # Filter by industry if selected
+    if selected_industry:
+        query = query.filter(influencer.industry == selected_industry)
+
+    # Filter by search query if provided
+    if search_query:
+        search_filter = (influencer.name.ilike(f'%{search_query}%') | 
+                         influencer.username.ilike(f'%{search_query}%') | 
+                         influencer.email.ilike(f'%{search_query}%') |
+                         influencer.followers.ilike(f'%{search_query}'))
+        query = query.filter(search_filter)
+
+    influencers = query.order_by(
+        db.case(
+            (influencer.industry == selected_industry, 0),  # Selected industry at the top
+            (influencer.industry != selected_industry, 1),  # Others follow
+            else_=2
+        )
+    ).all()
+
+    return render_template('sp_find.html', influencers=influencers, selected_industry=selected_industry, search_query=search_query)
 
 
 

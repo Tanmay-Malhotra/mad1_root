@@ -35,6 +35,9 @@
         }
         .form-group {
             margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         .button {
             padding: 5px 10px;
@@ -47,6 +50,9 @@
         .button:hover {
             background-color: #0056b3;
         }
+        .search-box {
+            margin-left: 20px;
+        }
     </style>
 </head>
 <body>
@@ -54,13 +60,19 @@
         <h2>Find Influencers</h2>
         <form method="GET" action="{{ url_for('sp_find') }}">
             <div class="form-group">
-                <label for="industry">Sort by Industry:</label>
-                <select name="industry" id="industry" onchange="this.form.submit()">
-                    <option value="">-- Select Industry --</option>
-                    {% for industry in ['Technology', 'Fashion', 'Food', 'Travel', 'Health'] %}
-                        <option value="{{ industry }}" {% if selected_industry == industry %}selected{% endif %}>{{ industry }}</option>
-                    {% endfor %}
-                </select>
+                <div>
+                    <label for="industry">Sort by Industry:</label>
+                    <select name="industry" id="industry" onchange="this.form.submit()">
+                        <option value="">-- Select Industry --</option>
+                        {% for industry in ['Technology', 'Fashion', 'Food', 'Travel', 'Health'] %}
+                            <option value="{{ industry }}" {% if selected_industry == industry %}selected{% endif %}>{{ industry }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="search-box">
+                    <label for="search">Search:</label>
+                    <input type="text" name="search" id="search" value="{{ search_query }}" placeholder="Search influencers..." onkeypress="if(event.keyCode==13){this.form.submit();}">
+                </div>
             </div>
         </form>
         <table>
@@ -71,6 +83,7 @@
                     <th>Email</th>
                     <th>Industry</th>
                     <th>Platform</th>
+                    <th>Followers</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -82,6 +95,7 @@
                         <td>{{ influencer.email }}</td>
                         <td>{{ influencer.industry }}</td>
                         <td>{{ influencer.platform }}</td>
+                        <td>{{ influencer.followers }}</td>
                         <td>
                             <a href="{{ url_for('ad_request', influencer_id=influencer.id) }}" class="button">Send Ad Request</a>
                         </td>
