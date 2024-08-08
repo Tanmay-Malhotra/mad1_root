@@ -162,6 +162,7 @@
             background-color: #333;
             color: white;
             padding: 10px 20px;
+            font-family: Arial, sans-serif;
         }
 
         nav .left {
@@ -182,8 +183,6 @@
         nav ul li a {
             color: white;
             text-decoration: none;
-            padding: 5px 10px;
-            display: block;
         }
 
         nav ul li a.active {
@@ -249,11 +248,11 @@
     <nav>
         <div class="left">SPOC Administrator</div>
         <ul>
-            <li><a href="admin_home.html">Home</a></li>
-            <li><a href="admin_sponsors.html">Sponsors</a></li>
-            <li><a href="admin_campaigns.html">Campaigns</a></li>
-            <li><a href="admin_influencers.html" class="active">Influencers</a></li>
-            <li><a href="logout.html">Logout</a></li>
+            <li><a href="{{ url_for('admin_home') }}" class="active">Home</a></li>
+            <li><a href="{{ url_for('admin_sponsors') }}">Sponsors</a></li>
+            <li><a href="{{ url_for('admin_campaigns') }}">Campaigns</a></li>
+            <li><a href="{{ url_for('admin_influencers') }}">Influencers</a></li>
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
         </ul>
     </nav>
     <div class="container">
