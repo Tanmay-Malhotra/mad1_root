@@ -46,9 +46,23 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            text-decoration: none;
+            white-space: nowrap;
         }
         .button:hover {
             background-color: #0056b3;
+        }
+        .btn-accept {
+            background-color: #28a745;
+        }
+        .btn-accept:hover {
+            background-color: #218838;
+        }
+        .btn-reject {
+            background-color: #dc3545;
+        }
+        .btn-reject:hover {
+            background-color: #c82333;
         }
     </style>
 </head>
@@ -65,6 +79,7 @@
                         <th>Requirements</th>
                         <th>Payment Amount</th>
                         <th>Status</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -74,6 +89,14 @@
                             <td>{{ ad_request.requirements }}</td>
                             <td>${{ ad_request.payment_amount }}</td>
                             <td>{{ ad_request.status }}</td>
+                            <td>
+                                <form method="POST" action="{{ url_for('accept_negotiation', ad_request_id=ad_request.id) }}" style="display:inline;">
+                                    <button type="submit" class="button btn-accept">Accept</button>
+                                </form>
+                                <form method="POST" action="{{ url_for('reject_negotiation', ad_request_id=ad_request.id) }}" style="display:inline;">
+                                    <button type="submit" class="button btn-reject">Reject</button>
+                                </form>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>

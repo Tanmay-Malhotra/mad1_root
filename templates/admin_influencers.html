@@ -1,0 +1,296 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Influencers</title>
+    <style>
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+        }
+
+        nav .left {
+            font-weight: bold;
+        }
+
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        nav ul li {
+            margin-left: 20px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+        }
+
+        nav ul li a.active {
+            text-decoration: underline;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f9f9f9;
+        }
+        .btn-flag {
+            background-color: #ffc107;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .btn-flag:hover {
+            background-color: #e0a800;
+        }
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .btn-delete:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="left">SPOC Administrator</div>
+        <ul>
+            <li><a href="{{ url_for('admin_home') }}">Home</a></li>
+            <li><a href="{{ url_for('admin_sponsors') }}">Sponsors</a></li>
+            <li><a href="{{ url_for('admin_campaigns') }}">Campaigns</a></li>
+            <li><a href="{{ url_for('admin_influencers') }}" class="active">Influencers</a></li>
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h2>Influencers</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Platform</th>
+                    <th>Followers</th>
+                    <th>Flagged</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for influencer in influencers %}
+                    <tr>
+                        <td>{{ influencer.name }}</td>
+                        <td>{{ influencer.username }}</td>
+                        <td>{{ influencer.email }}</td>
+                        <td>{{ influencer.platform }}</td>
+                        <td>{{ influencer.followers }}</td>
+                        <td>{{ influencer.flagged }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('flag_influencer', influencer_id=influencer.id) }}" style="display:inline;">
+                                <button type="submit" class="btn-flag">Flag</button>
+                            </form>
+                            <form method="POST" action="{{ url_for('delete_influencer', influencer_id=influencer.id) }}" style="display:inline;">
+                                <button type="submit" class="btn-delete">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+ -->
+
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Influencers</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 0;
+            margin: 0;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+        }
+
+        nav .left {
+            font-weight: bold;
+        }
+
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        nav ul li {
+            margin-left: 20px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+            display: block;
+        }
+
+        nav ul li a.active {
+            text-decoration: underline;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin: 20px auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f9f9f9;
+        }
+
+        .btn-flag {
+            background-color: #ffc107;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .btn-flag:hover {
+            background-color: #e0a800;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .btn-delete:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="left">SPOC Administrator</div>
+        <ul>
+            <li><a href="admin_home.html">Home</a></li>
+            <li><a href="admin_sponsors.html">Sponsors</a></li>
+            <li><a href="admin_campaigns.html">Campaigns</a></li>
+            <li><a href="admin_influencers.html" class="active">Influencers</a></li>
+            <li><a href="logout.html">Logout</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h2>Influencers</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Platform</th>
+                    <th>Followers</th>
+                    <th>Flagged</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+                <tbody>
+                    {% for influencer in influencers %}
+                        <tr>
+                            <td>{{ influencer.name }}</td>
+                            <td>{{ influencer.username }}</td>
+                            <td>{{ influencer.email }}</td>
+                            <td>{{ influencer.platform }}</td>
+                            <td>{{ influencer.followers }}</td>
+                            <td>{{ influencer.flagged }}</td>
+                            <td>
+                                <form method="POST" action="{{ url_for('flag_influencer', influencer_id=influencer.id) }}" style="display:inline;">
+                                    <button type="submit" class="btn-flag">Flag</button>
+                                </form>
+                                <form method="POST" action="{{ url_for('delete_influencer', influencer_id=influencer.id) }}" style="display:inline;">
+                                    <button type="submit" class="btn-delete">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>          
+        </table>
+    </div>
+</body>
+</html>

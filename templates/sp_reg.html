@@ -26,7 +26,12 @@
             display: flex;
             flex-direction: column;
         }
-        .container form input,
+        .container form input {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
         .container form select {
             margin-bottom: 10px;
             padding: 10px;
@@ -44,19 +49,28 @@
         .container form button:hover {
             background-color: #0056b3;
         }
+        .flash-messages {
+            margin-bottom: 20px;
+            color: red;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>Sponsor Registration</h2>
+        
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-          {% for category, message in messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
             <div class="alert alert-{{ category }}">{{ message }}</div>
-          {% endfor %}
+            {% endfor %}
+        </div>
         {% endif %}
         {% endwith %}
+        
         <form action="{{ url_for('sp_reg') }}" method="POST">
+            <input type="text" name="name" placeholder="Name" required>
             <input type="text" name="username" placeholder="Username" required>
             <input type="password" name="password" placeholder="Password" required>
             <input type="email" name="email" placeholder="Email" required>

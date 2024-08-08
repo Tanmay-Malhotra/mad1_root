@@ -122,7 +122,7 @@
                                 <form method="POST" action="{{ url_for('reject_ad_request', ad_request_id=ad_request.id) }}" style="display:inline;">
                                     <button type="submit" class="btn btn-reject">Reject</button>
                                 </form>
-                                <button class="btn btn-negotiate">Negotiate</button>
+                                <a href="{{ url_for('negotiate_ad_request', influencer_id=influencer.id, ad_request_id=ad_request.id) }}" class="btn btn-negotiate">Negotiate</a>
                             </td>
                         </tr>
                     {% endfor %}

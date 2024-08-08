@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        /* Add some basic styles for layout */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+        }
+
+        nav .left {
+            font-weight: bold;
+        }
+
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        nav ul li {
+            margin-left: 20px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+        }
+
+        nav ul li a.active {
+            text-decoration: underline;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .stats {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .stat {
+            flex: 1;
+            padding: 20px;
+            margin: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .stat p {
+            font-size: 1.5em;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="left">SPOC Administrator</div>
+        <ul>
+            <li><a href="{{ url_for('admin_home') }}" class="active">Home</a></li>
+            <li><a href="{{ url_for('admin_sponsors') }}">Sponsors</a></li>
+            <li><a href="{{ url_for('admin_campaigns') }}">Campaigns</a></li>
+            <li><a href="{{ url_for('admin_influencers') }}">Influencers</a></li>
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+    </nav>
+    <div class="content">
+        <h1>Welcome, Admin</h1>
+        <h1>Manage SPOC</h1>
+        <div class="stats">
+            <div class="stat">
+                <h3>Total Users</h3>
+                <p>{{ total_users }}</p>
+            </div>
+            <div class="stat">
+                <h3>Number of Sponsors</h3>
+                <p>{{ number_of_sponsors }}</p>
+            </div>
+            <div class="stat">
+                <h3>Number of Influencers</h3>
+                <p>{{ number_of_influencers }}</p>
+            </div>
+            <div class="stat">
+                <h3>Number of Campaigns</h3>
+                <p>{{ number_of_campaigns }}</p>
+            </div>
+            <div class="stat">
+                <h3>Active Ad Requests</h3>
+                <p>{{ active_ad_requests }}</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
