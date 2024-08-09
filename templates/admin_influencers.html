@@ -242,6 +242,10 @@
         .btn-delete:hover {
             background-color: #c82333;
         }
+        .alert {
+            color: red;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -257,6 +261,13 @@
     </nav>
     <div class="container">
         <h2>Influencers</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+        {% endwith %}
         <table>
             <thead>
                 <tr>

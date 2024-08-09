@@ -64,11 +64,22 @@
         .btn-reject:hover {
             background-color: #c82333;
         }
+        .alert {
+            color: red;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>Ad Requests for Campaign: {{ campaign.name }}</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+        {% endwith %}
         
         <div class="section">
             <h3>New Negotiations</h3>

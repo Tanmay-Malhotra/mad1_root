@@ -53,11 +53,22 @@
         .search-box {
             margin-left: 20px;
         }
+        .alert {
+            color: red;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>Find Influencers</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+        {% endwith %}
         <form method="GET" action="{{ url_for('sp_find') }}">
             <div class="form-group">
 

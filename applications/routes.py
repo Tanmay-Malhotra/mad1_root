@@ -5,38 +5,6 @@ from applications.database import db
 from applications.models import influencer,sponsor,campaign,adrequest
 from sqlalchemy import desc
 
-""" @app.route('/')
-def home():
-    return render_template('login.html')
-
-# homepage for login
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        
-        # Try to find the user in the Sponsor model
-        user = sponsor.query.filter_by(username=username).first()
-        if user and user.password == password:
-            session['user_id'] = user.id
-            flash('Login successful!', 'success')
-            return redirect(url_for('sp_home'))
-              # Redirect to sponsor homepage
-        
-        # Try to find the user in the Influencer model
-        user = influencer.query.filter_by(username=username).first()
-        if user and user.password == password:
-            session['user_id'] = user.id
-            flash('Login successful!', 'success')
-            return redirect(url_for('inf_home'))  # Redirect to influencer homepage
-        
-        # If no matching user found or password incorrect
-        flash('Invalid username or password. Please try again.', 'danger')
-    
-    return render_template('login.html') """
-
 @app.route('/')
 def home():
     return render_template('login.html')
@@ -50,21 +18,18 @@ def login():
         # Check for admin login
         if username == 'admin' and password == 'admin':
             session['admin_logged_in'] = True
-            flash('Admin login successful!', 'success')
             return redirect(url_for('admin_home'))
 
         # Try to find the user in the Sponsor model
         user = sponsor.query.filter_by(username=username).first()
         if user and user.password == password:
             session['user_id'] = user.id
-            flash('Login successful!', 'success')
             return redirect(url_for('sp_home'))  # Redirect to sponsor homepage
         
         # Try to find the user in the Influencer model
         user = influencer.query.filter_by(username=username).first()
         if user and user.password == password:
             session['user_id'] = user.id
-            flash('Login successful!', 'success')
             return redirect(url_for('inf_home'))  # Redirect to influencer homepage
         
         # If no matching user found or password incorrect
@@ -90,34 +55,18 @@ def admin_home():
                            active_ad_requests=active_ad_requests)
     
 
-
-
-
-@app.route('/admin/manage_ads')
-def manage_ads():
-    # Implement the logic for admin ad management
-    return "Admin Ad Management Page"
-
-@app.route('/admin/find/campaigns')
-def find_campaigns():
-    # Implement the logic for finding resources as admin
-    return "Admin Find Page"
-
-@app.route('/admin/find/influencers')
-def find_influencers():
-    # Implement the logic for finding resources as admin
-    return "Admin Find Page"
-
-@app.route('/admin/find/sponsors')
-def admin_sponsors():
-    sponsors = sponsor.query.all()  # Fetch all sponsors
-    return render_template('admin_sponsors.html', sponsors=sponsors)
-
 @app.route('/logout')
 def logout():
     session.clear()
     flash('You have been logged out.', 'success')
     return redirect(url_for('login'))
+    
+@app.route('/admin/find/sponsors')
+def admin_sponsors():
+    sponsors = sponsor.query.all()  # Fetch all sponsors
+    return render_template('admin_sponsors.html', sponsors=sponsors)
+
+
 
 @app.route('/admin/sponsor/flag/<int:sponsor_id>', methods=['POST'])
 def flag_sponsor(sponsor_id):
@@ -127,14 +76,6 @@ def flag_sponsor(sponsor_id):
     flash('Sponsor has been flagged.', 'success')
     return redirect(url_for('admin_sponsors'))
 
-""" @app.route('/admin/sponsor/delete/<int:sponsor_id>', methods=['POST'])
-def delete_sponsor(sponsor_id):
-    sponsor_to_delete = sponsor.query.get_or_404(sponsor_id)
-    db.session.delete(sponsor_to_delete)
-    db.session.commit()
-    flash('Sponsor has been deleted.', 'success')
-    return redirect(url_for('admin_sponsors'))
- """
 
 @app.route('/admin/sponsor/delete/<int:sponsor_id>', methods=['POST'])
 def delete_sponsor(sponsor_id):

@@ -66,11 +66,22 @@
         .btn-negotiate:hover {
             background-color: #e0a800;
         }
+        .alert {
+            color: red;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>Ad Management for {{ influencer.username }}</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+        {% endwith %}
         
         <div class="section">
             <h3>New Negotiations</h3>
