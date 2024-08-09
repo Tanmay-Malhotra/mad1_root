@@ -60,12 +60,11 @@ def logout():
     session.clear()
     flash('You have been logged out.', 'success')
     return redirect(url_for('login'))
-    
+
 @app.route('/admin/find/sponsors')
 def admin_sponsors():
     sponsors = sponsor.query.all()  # Fetch all sponsors
     return render_template('admin_sponsors.html', sponsors=sponsors)
-
 
 
 @app.route('/admin/sponsor/flag/<int:sponsor_id>', methods=['POST'])
@@ -285,7 +284,7 @@ def reject_ad_request(ad_request_id):
     return redirect(url_for('ad_management'))
 
 
-@app.route('/inf_request_ad/<int:campaign_id>', methods=['GET', 'POST'])
+""" @app.route('/inf_request_ad/<int:campaign_id>', methods=['GET', 'POST'])
 def inf_request_ad(campaign_id):
     inf = influencer.query.get(session['user_id'])
     cmp = campaign.query.get_or_404(campaign_id)
@@ -306,7 +305,7 @@ def inf_request_ad(campaign_id):
         flash('Ad request sent successfully!', 'success')
         return redirect(url_for('ad_management'))
     
-    return render_template('inf_request_ad.html', campaign=cmp)
+    return render_template('inf_request_ad.html', campaign=cmp) """
 
 
 
@@ -508,9 +507,6 @@ def delete_ad_request(ad_request_id):
 
 
 
-@app.route('/sp_statistics')
-def sp_statistics():
-    return render_template('sp_statistics.html')
 
 @app.route('/sp_logout')
 def sp_logout():
