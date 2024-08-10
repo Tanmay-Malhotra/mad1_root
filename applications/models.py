@@ -2,15 +2,6 @@ from applications.database import db
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
-""" class sponsor(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=True)
-    username = db.Column(db.String(20), unique=True, nullable=False)
-    password = db.Column(db.String(100), nullable=False) 
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    industry = db.Column(db.String(100))
-    #making changes from here 
-    campaigns = db.relationship('campaign', backref='sponsor', lazy=True) """
 
 class sponsor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -19,7 +10,7 @@ class sponsor(db.Model):
     password = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     industry = db.Column(db.String(100))
-    flagged = db.Column(db.String(10), nullable=False, default="no")  # New column
+    flagged = db.Column(db.String(10), nullable=False, default="no")  
     campaigns = db.relationship('campaign', backref='sponsor', lazy=True)
 
 class campaign(db.Model):
@@ -57,9 +48,5 @@ class adrequest(db.Model):
     status = db.Column(db.String(50), nullable=False, default='Request Sent')
 
 
-
-
-#class admanagement(db.Model):
-    #id = db.Column(db.Integer, primary_key=True)
 
 
